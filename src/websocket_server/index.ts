@@ -47,6 +47,7 @@ export const webSocketServer = () => {
                {
                 console.log("mes", mes);
                 const db = getDb();
+                console.log('mes.data', mes.data)
                 const roomUser =  db.users[0];
                 const newRoom = {
                   roomId: db.rooms.length,
@@ -57,16 +58,51 @@ export const webSocketServer = () => {
                 };
                 db.rooms.push(newRoom);
                 console.log('db', db);
+                console.log('db.rooms.roomUsers', db.rooms[0].roomUsers);
                 const response = {
-                  type: "create_game",
-                  data: JSON.stringify({idGame: 1, idPlayer: 0}),
-              id: 0,
+                  type: "update_room",
+                  data: JSON.stringify([
+                          {
+                              roomId: db.rooms.length,
+                              roomUsers:
+                                  [
+                                      {
+                                        name: roomUser.name,
+                                        index: roomUser.userId,
+                                      }
+                                  ],
+                          },
+                      ]),
+                  id: 0,
                 }
+                console.log('response', response);
                 ws.send(JSON.stringify(response));
                 }
                 break;
               case 'add_user_to_room':
                 console.log("mes", mes);
+                {
+                  console.log("mes", mes);
+                  const db = getDb();
+                  console.log('mes.data_add user', mes.data)
+                  const roomUser =  db.users[0];
+                  const newRoom = {
+                    roomId: db.rooms.length,
+                    roomUsers: [{
+                      userId: roomUser.userId,
+                      name: roomUser.name
+                    }]
+                  };
+                  db.rooms.push(newRoom);
+                  console.log('db', db);
+                  console.log('db.users', db.users);
+                  const response = {
+                    type: "update_room",
+                    data: JSON.stringify({idGame: 1, roomUsers: [JSON.stringify({userId: roomUser.userId, name: roomUser.name})]}),
+                    id: 0,
+                  }
+                  ws.send(JSON.stringify(response));
+                  }
                 break;
               case 'add_ships':
                 console.log("mes", mes);
@@ -85,7 +121,7 @@ export const webSocketServer = () => {
                 break;
             }
           } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error); 
           }
         });
     });
