@@ -14,16 +14,16 @@ export const webSocketServer = () => {
           try {
             const mes = JSON.parse(message);
             console.log("mes", mes);
-            console.log("mes.type", mes.type);
             switch (mes.type) {
               case 'reg':
+                {
+                const db = getDb();
                 const user = JSON.parse(mes.data);
                 const newUser: User = {
-                  userId: mes.id,
+                  userId: db.users.length,
                   name: user.name,
                   password: user.password,
                 }
-                const db = getDb();
                 db.users.push(newUser);
                 setDb(db);
                 console.log('db', db);
@@ -41,14 +41,35 @@ export const webSocketServer = () => {
                     ws.send(JSON.stringify(response));
                   };
                   reg(newUser.name, newUser.userId, false, '');
+                }
                 break;
               case 'create_room':
+               {
+                console.log("mes", mes);
+                const db = getDb();
+                const roomUser =  db.users[0];
+                const newRoom = {
+                  roomId: db.rooms.length,
+                  roomUsers: [{
+                    userId: roomUser.userId,
+                    name: roomUser.name
+                  }]
+                };
+                db.rooms.push(newRoom);
+                console.log('db', db);
+                const response = {
+                  type: "create_game",
+                  data: JSON.stringify({idGame: 1, idPlayer: 0}),
+              id: 0,
+                }
+                ws.send(JSON.stringify(response));
+                }
                 break;
-            //   case 'add_user_to_room':
-            // 
-            //     break;
-            //   case 'add_ships':
-            //     
+              case 'add_user_to_room':
+                console.log("mes", mes);
+                break;
+              case 'add_ships':
+                console.log("mes", mes);
             //     break;
             //   case 'attack':
             //     

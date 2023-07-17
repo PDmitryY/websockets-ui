@@ -23,8 +23,7 @@ export interface ShipOnBoard {
 
 export interface Room {
     roomId: number,
-    type: string,
-    data: string
+    roomUsers: Omit<User, 'password'>[]
 }
 
 export interface GameSession {
